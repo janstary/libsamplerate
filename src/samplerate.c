@@ -495,24 +495,15 @@ src_short_to_float_array (const short *in, float *out, int len)
 
 void
 src_float_to_short_array (const float *in, short *out, int len)
-{	double scaled_value ;
-
-	while (len)
-	{	len -- ;
-
-		scaled_value = in [len] * (8.0 * 0x10000000) ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
-		{	out [len] = 32767 ;
-			continue ;
-			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
-		{	out [len] = -32768 ;
-			continue ;
-			} ;
-
-		out [len] = (short) (lrint (scaled_value) >> 16) ;
-		} ;
-
+{
+	while (len--) {
+		if (in [len] >= 1.0)
+			out [len] = INT16_MAX;
+		else if (in[len] <= -1.0)
+			out [len] = INT16_MIN ;
+		else
+			out [len] = (short) lrint (in [len] * 0x8000) ;
+	}
 } /* src_float_to_short_array */
 
 void
